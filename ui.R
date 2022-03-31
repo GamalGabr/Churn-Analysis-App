@@ -30,11 +30,57 @@ library(shinyanimate)
 library(xgboost)
 library(randomForest)
 library(shinycustomloader)
-
+library(hover)
 source("css_churn2.R")
 
 source("important_data2.R")
 
+
+library(shiny)
+
+CSS <- "
+.morecontent span {
+    display: none;
+}
+.morelink {
+    display: block;
+}
+"
+
+JS <- '
+$(document).ready(function() {
+    // Configure/customize these variables.
+    var showChar = 180;  // How many characters are shown by default
+    var ellipsestext = "...";
+    var moretext = "Show more >";
+    var lesstext = "Show less";
+    
+    $(".more").each(function() {var content = $(this).html();
+        if(content.length > showChar) {
+            var c = content.substr(0, showChar);
+            var h = content.substr(showChar, content.length - showChar);
+            var html = c + "<span class=\\\"moreellipses\\\">" + ellipsestext 
+              + "&nbsp;</span><span class=\\\"morecontent\\\"><span>" + h 
+              + "</span>&nbsp;&nbsp;<a href=\\\"\\\" class=\\\"morelink\\\">" 
+              + moretext + "</a></span>";
+            $(this).html(html);
+        }
+    });
+ 
+    $(".morelink").click(function(){
+        if($(this).hasClass("less")) {
+            $(this).removeClass("less");
+            $(this).html(moretext);
+        } else {
+            $(this).addClass("less");
+            $(this).html(lesstext);
+        }
+        $(this).parent().prev().toggle();
+        $(this).prev().toggle();
+        return false;
+    });
+});
+'
 
 
 
@@ -55,6 +101,14 @@ source("important_data2.R")
 
 
 ui<-fluidPage(
+  
+  
+      tags$style(HTML(CSS)), 
+      tags$script(HTML(JS)),
+    
+    
+    
+  
   
   #theme = bslib::bs_theme(bootswatch = "darkly"),
   #theme = shinytheme("cyborg"),
@@ -79,10 +133,10 @@ $('#navbar li a[data-value=tab3]').hide();
   
   useShinyjs(),
   
-  #useShinyalert(force=TRUE),
+  useShinyalert(force=TRUE),
   
   navbarPage(
-    id="navbar",
+    #id="navbar",
     "Churn Analytics",
     tabPanel(title = "Welcome",      
              value = "tab1",
@@ -151,64 +205,68 @@ $('#navbar li a[data-value=tab3]').hide();
              
              HTML("<h2 class='glowIn'>Most Important Variables</h2>"),
              
-             
-             HTML("<p>Welcome to this Churn analysis app! The original IBM dataset contained the information of 7043 fictional telecommunications customers, with 21 variables relating to whether or not they churned. This app employs cutting-edge artifical intelligence to uncover key relationships between Churn and a range of variables.
-                 In keeping with traditional data analytics, the original dataset was partitioned into a training and test set.</p>
-                    <details>
-                    <summary>Read more</summary>
-                 Three algorithms were trained: using the original dataset with its inherent class imbalance of churners/non-churners, a random forest
-                 model was constructed. In addition, using upsampled data (oversampling of the minority class of churners), a
-                 gradient boosting and a random forest model were also trained."),
-             
-             br(),
-             
-             
-             p("Upsampling produces a balanced dataset, and aims to
-                 eliminate the predictive bias produced by imbalanced datasets.The dependent variable Churn signifies whether the customer departed within the last month or not.
-                 The response,",span("No", style = "color:#BB86FC")," ,signifies the customers who did not leave the company last month, while the response, ",span("Yes", style = "color:#BB86FC"),", indicates the clients that decided to terminate their relations with the company. Gauging the likelihood of customer churn is of primary concern for large companies; the potential impact on revenue, particularly in the telecommunications sector, is of paramount importance.
-                                                                                                                                                               Whilst the definition of most terms are likely to be clear, clarification of some potentially confusing terms is given below :"),    
-             tags$ul(
-               tags$li(tags$b("Tenure"), " - Number of months the customer has stayed with the company"),
-               tags$li(tags$b("Multiple lines"), " - Whether the customer has multiple lines or not (",span("Yes, No, No phone service", style = "color:#BB86FC"),")"),
-               tags$li(tags$b("Monthly Charges"), " - The amount charged to the customer monthly"),
-               tags$li(tags$b("Total Charges"), " - The total amount charged to the customer"),
-               tags$li(tags$b("Churn"), " - Whether the customer churned or not, i.e. left the company (",span("Yes or No", style = "color:#BB86FC"),")"),
-               tags$li(tags$b("XGB_UP"), " - Extreme Gradient Boosting, a type of tree-based algorithm that was trained using upsampled data "),
-               tags$li(tags$b("Random_Forest_Up"), " - Random Forest algorithm trained on upsampled data 
+            tags$span(
+            class = "more", 
+             HTML( "Welcome to this Churn analysis app! The original IBM dataset contained the information of 7043 
+                 fictional telecommunications customers, with 21 variables relating to whether or not they churned. 
+                 This app employs cutting-edge artifical intelligence to uncover key relationships between Churn and 
+                 a range of variables. In keeping with traditional data analytics, the original dataset was partitioned 
+                 into a training and test set. Three algorithms were trained: using the original dataset with its inherent 
+                 class imbalance of churners/non-churners, a random forest model was constructed. In addition, using 
+                 upsampled data (oversampling of the minority class of churners), a gradient boosting and a random forest 
+                 model were also trained.
+                 
+              
+              <p>Upsampling produces a balanced dataset, with the aim of eliminating the predictive bias produced by imbalanced 
+              datasets. Churn,the dependent variable, signifies whether the customer departed within the last month or not.
+              The response ,<span style= 'color:blue;' >No</span>,  signifies the customers who did not leave the company 
+              last month, while the response, Yes , indicates the clients that decided 
+              to terminate their relations with the company. Gauging the likelihood of customer churn is of primary concern 
+              for large companies; the potential impact on revenue, particularly in the telecommunications sector, is of 
+              paramount importance. Whilst the definition of most terms are likely to be clear, clarification of some potentially 
+              confusing terms is given below </p>
+              <br>  
+          <ul>
+          <li> Tenure - Number of months the customer has stayed with the company</li>
+          <li> Multiple lines - Whether the customer has multiple lines or not (Yes, No, No phone service)</li>
+          <li> Monthly Charges - The amount charged to the customer monthly</li>
+          <li> Total Charges - The total amount charged to the customer</li>
+          <li> Churn - Whether the customer churned or not, i.e. left the company (Yes or No)</li> 
+          <li> XGB_UP - Extreme Gradient Boosting, a type of tree-based algorithm that was trained using upsampled data</li> 
+          <li> Random_Forest_Up - Random Forest algorithm trained on upsampled data</li>
+          </ul>
+                       
+               
                        
                        
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              " )),
+            
+            
+             
+             
+             
+    
+             
+             
+            
+                                                
                        
-                       
-                       
-                  </details>")),
-             
-             p("Welcome to this Churn analysis app! The original IBM dataset contained the information of 7043 fictional telecommunications customers, with 21 variables relating to whether or not they churned. This app employs cutting-edge artifical intelligence to uncover key relationships between Churn and a range of variables.
-                 In keeping with traditional data analytics, the original dataset was partitioned into a training and test set. Three algorithms were trained: using the original dataset with its inherent class imbalance of churners/non-churners, a random forest
-                 model was constructed. In addition, using upsampled data (oversampling of the minority class of churners), a
-                 gradient boosting and a random forest model were also trained."),
-             
-             br(),
-             
-             
-             p("Upsampling produces a balanced dataset, and aims to
-                 eliminate the predictive bias produced by imbalanced datasets. The dependent variable Churn signifies whether the customer departed within the last month or not.
-                 The response,",span("No", style = "color:#BB86FC")," ,signifies the customers who did not leave the company last month, while the response, ",span("Yes", style = "color:#BB86FC"),", indicates the clients that decided to terminate their relations with the company. Gauging the likelihood of customer churn is of primary concern for large companies; the potential impact on revenue, particularly in the telecommunications sector, is of paramount importance.
-                                                                                                                                                               Whilst the definition of most terms are likely to be clear, clarification of some potentially confusing terms is given below :"),    
-             tags$ul(
-               tags$li(tags$b("Tenure"), " - Number of months the customer has stayed with the company"),
-               tags$li(tags$b("Multiple lines"), " - Whether the customer has multiple lines or not (",span("Yes, No, No phone service", style = "color:#BB86FC"),")"),
-               tags$li(tags$b("Monthly Charges"), " - The amount charged to the customer monthly"),
-               tags$li(tags$b("Total Charges"), " - The total amount charged to the customer"),
-               tags$li(tags$b("Churn"), " - Whether the customer churned or not, i.e. left the company (",span("Yes or No", style = "color:#BB86FC"),")"),
-               tags$li(tags$b("XGB_UP"), " - Extreme Gradient Boosting, a type of tree-based algorithm that was trained using upsampled data "),
-               tags$li(tags$b("Random_Forest_Up"), " - Random Forest algorithm trained on upsampled data "),
-             ),
-             
-             
-             
-             
-             
-    ),
+                          
+                        
+                    
+     ),
+           
+       
     
     tabPanel(title="Visuals",
              value="tab3",
@@ -355,13 +413,10 @@ $('#navbar li a[data-value=tab3]').hide();
              mainPanel(
                
                tags$h2("ALE plot insight!"),
-               HTML("<div class='button'>HOVER ME</div>"),
+               #HTML("<div class='button'>HOVER ME</div>"),
                hr(),
                
-               fluidRow(column(12, div(shiny::actionButton(
-               'ALEpress', 
-                                                    class='button', label='i',  style= 
-                                                    'float: right')))),
+               
                
                
                
@@ -374,12 +429,15 @@ $('#navbar li a[data-value=tab3]').hide();
                br(),
                h2("What are ALE plots?"),
                hr(),
-               tags$div(HTML("<p><strong><span style='color:white;'>Accumulated local effects (ALE) illustate how variables impact the predicted outcome of an machine learning algorithm on average.<p><details>
-                    <summary>Read more</summary>
-                          For numerical variables, the ALE algorithm averages the difference in small windows of a variable's range. ALE graphs are centered at 0.
-                          If the reading for variable X, at the point X=3, translates as -4, this can roughly be interpreted as indicating that the prediction at this value is lower than the average prediction by 4 units. In a nutshell,
-                          ALE plots illustate how the predictions of a machine learning model alter between subsections of an independent variable's overall range. The impact of categorical features can be similarly interpreted: each bar
-                          indicates the modification in the model's predicition when the respective feature possesses the respective property.</span></strong></details>")),
+               
+            HTML("<p>
+                  Accumulated local effects (ALE) illustate how variables impact the predicted outcome of an machine learning algorithm on average.
+                  For numerical variables, the ALE algorithm averages the difference in small windows of a variable's range. ALE graphs are centered 
+                  at 0.If the reading for variable X, at the point X=3, translates as -4, this can roughly be interpreted as indicating that the 
+                  prediction at this value is lower than the average prediction by 4 units. In a nutshell, ALE plots illustate how the predictions of 
+                  a machine learning model alter between subsections of an independent variable's overall range. The impact of categorical features can 
+                  be similarly interpreted: each bar indicates the modification in the model's predicition when the respective feature possesses the 
+                  respective property.</p> " ),
                
                
                
@@ -588,3 +646,4 @@ $('#navbar li a[data-value=tab3]').hide();
   
   
 )
+
