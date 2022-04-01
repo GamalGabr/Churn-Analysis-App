@@ -153,36 +153,40 @@ $('#navbar li a[data-value=tab3]').hide();
              br(),
              br(),
              #opening page intro with moving text
-             HTML("<h1>
-        <span>There</span>
-        <span>are</span>
-        <span>no</span>
-        <span>limits</span>
+             HTML("<h1 style='text-align:center'>
+        <span>This</span>
+        <span>project</span>
+        <span>sought</span>
         <span>to</span>
+        <span>reveal</span>
         <span>what</span>
-        <span>you</span>
-        <span>can</span>
-        <span>accomplish,</span>
-        <span>except</span>
-        <span>the</span>
-        <span>limits</span>
-        <span>you</span>
-        <span>place</span>
-        <span>on</span>
-        <span>your</span>
-        <span>own</span>
-        <span>thinking,</span>
+        <span>variables</span>
         <span>are</span>
-        <span>no</span>
-        <span>limits</span>
-        <span>to</span>
-        <span>what</span>
-        <span>you</span>
-        <span>can</span>
-        <span>accomplish,</span>
-        <span>except</span>
         <span>the</span>
-        <span>limits.</span>
+        <span>key</span>
+        <span>predictors</span>
+        <span>limits</span>
+        <span>of</span>
+        <span>the</span>
+        <span>phenomenon</span>
+        <span>of</span>
+        <span>Churn</span>
+        <span>.,</span>
+        <span>The</span>
+        <span>rate</span>
+        <span>of</span>
+        <span>Churn</span>
+        <span>indicates</span>
+        <span>the</span>
+        <span>proportion</span>
+        <span>of</span>
+        <span>subscribers</span>
+        <span>of</span>
+        <span>a</span>
+        <span>service</span>
+        <span>that</span>
+        <span>are</span>
+        <span>leaving.</span>
           </h1>"),
              
              
@@ -271,9 +275,9 @@ $('#navbar li a[data-value=tab3]').hide();
     tabPanel(title="Visuals",
              value="tab3",
          
-             sidebarPanel(
+             sidebarPanel(width = 3,
                
-               tags$style(".well {background-color: #1F1B24  ;}"),
+               tags$style(".well {background-color: #808080  ;}"),
                
                
                
@@ -319,7 +323,7 @@ $('#navbar li a[data-value=tab3]').hide();
                
                br(),
                
-               withSpinner(highchartOutput("HIGHCHARTOPT", height = "160%", width="100%")),  
+               withSpinner(highchartOutput("HIGHCHARTOPT", height = "170%", width="110%")),  
                br(),
                
                
@@ -370,11 +374,14 @@ $('#navbar li a[data-value=tab3]').hide();
                #moving text effect
                HTML("<h2 class='glowIn'>Most Important Variables</h2>"),
                   
-               
+               #<button class="glow-on-hover" type="button">HOVER ME, THEN CLICK ME!</button>
                hr(),
-               fluidRow(column(12, div(actionButton("vimpress", icon("info"),
-                                                    style="color: #fff; background-color: #9D00FF; width:70px; height:80px; border-color: #2e6da4"), style = "float: right"))),
-               
+               #fluidRow(column(12, div(actionButton("vimpress", icon("info"),
+               #                                     style="color: #fff; background-color: #9D00FF; width:70px; height:80px; border-color: #2e6da4"), style = "float: right"))),
+               fluidRow(column(12, div(shiny::actionButton("vimpress", class='glow-on-hover',
+                                      label='Info', width = "50px",
+ style = 'float: right')))),
+                                                    
                br(),
                plotOutput("PlotImportance"),
                br(),
@@ -498,28 +505,47 @@ $('#navbar li a[data-value=tab3]').hide();
                  br(),
                  h2("What are Breakdown Plots conveying?"),
                  hr(),
-                 HTML("<p><strong><span style='color:white;'>There are two broad types of model explanatory tools, namely local and global. For instance,
-                         ALE plots yield an overall understanding of a model's predictions aggregated over an entire dataset.</p>
-                    <details>
-                    <summary>Read more</summary>The breakdown algorithm provides local explanations: in other words, they help provide information
-                         about a prediction for a single observation. This algorithm helps unveil which particular variables contribute the most to a specific observation/prediction. From the top down of the breakdown plots featured above: the intercept row indicates the overall mean value of predictions for the model when trained on the entire dataset. The green and red bars signify the contribution of each variable towards the overall prediction. Red bars
-                         indicate that the respective variable decreases the probability that the particular customer will churn, whereas green bars represent variables that increase the likelihood a customer will churn. The purple bar shows the prediction for the particular customer in question. The numerical values
-                         capture the extent of influence of respective variables. </span></strong></details>"),
+                 tags$span(
+                   class = "more", 
+                   ("
+                      There are two broad types of model explanatory tools, namely local and global. For instance,
+                      ALE plots yield an overall understanding of a model's predictions aggregated over an entire dataset.
+                      The breakdown algorithm provides local explanations: in other words, they help provide information
+                      about a prediction for a single observation. This algorithm helps unveil which particular variables
+                      contribute the most to a specific observation/prediction. From the top down of the breakdown plots 
+                      featured above: the intercept row indicates the overall mean value of predictions for the model when 
+                      trained on the entire dataset. The green and red bars signify the contribution of each variable 
+                      towards the overall prediction. Red bars indicate that the respective variable decreases the probability 
+                      that the particular customer will churn, whereas green bars represent variables that increase the 
+                      likelihood a customer will churn. The purple bar shows the prediction for the particular customer in 
+                      question. The numerical values capture the extent of influence of respective variables.")),
                  
                  
-                 
+               )  
+        )     
+    ),
+            
+            
+             
+             
+             
+    
+             
+             
+            
+                                                
+                       
+                          
+                        
+                    
+    
                  
          
-                 
-                 
-                 br(),
-                 br(),
+           
                  
                  
                  
-               )
-             )
-    ),
+              
     
     
     
@@ -646,4 +672,5 @@ $('#navbar li a[data-value=tab3]').hide();
   
   
 )
+
 
