@@ -513,8 +513,8 @@ server <- function(input, output, session) {
     
     
     
-    
-    
+    #delay appearance of TABWELCOME
+    #delay(7000, runjs("$('#navbar li a[data-value=TABWELCOME]').hide();"))
     
     
     
@@ -616,3 +616,6 @@ server <- function(input, output, session) {
     })
     
 }
+
+
+
