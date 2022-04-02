@@ -38,6 +38,10 @@ source("important_data2.R")
 
 library(shiny)
 
+
+
+
+
 CSS <- "
 .morecontent span {
     display: none;
@@ -46,6 +50,41 @@ CSS <- "
     display: block;
 }
 "
+
+
+
+
+
+#jscode<-"shinyjs.init=function() {
+
+#"$('#navbar li a[data-value=TABWELCOME]').hide();});
+
+#}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 JS <- '
 $(document).ready(function() {
@@ -115,20 +154,26 @@ ui<-fluidPage(
   tags$style(cssUPGRADE),
   # Pass that theme object to UI function
   #theme = my_theme,
-  #extendShinyjs(text = jscode, functions = "init"),
+#extendShinyjs(text = jscode, functions = "init"),
   
+useShinyjs(),
 tags$head(HTML("<script type='text/javascript'>
 
 shinyjs.init=function() {
  
-$('#navbar li a[data-value=tab1]').hide();
 
-$('#navbar li a[data-value=tab2]').hide();
+$('#navbar li a[data-value=TABWELCOME]').show();
 
-$('#navbar li a[data-value=tab3]').hide();
 
 }
 </script>")),
+
+
+
+
+
+
+
   
   
   useShinyjs(),
@@ -136,10 +181,10 @@ $('#navbar li a[data-value=tab3]').hide();
   useShinyalert(force=TRUE),
   
   navbarPage(
-    #id="navbar",
+    id = "navbar",
     "Churn Analytics",
     tabPanel(title = "Welcome",      
-             value = "tab1",
+             value="TABWELCOME",
              
              
              
@@ -153,7 +198,7 @@ $('#navbar li a[data-value=tab3]').hide();
              br(),
              br(),
              #opening page intro with moving text
-             HTML("<h1 style='text-align:center'>
+             HTML("<div class='center'> <h1>
         <span>This</span>
         <span>project</span>
         <span>sought</span>
@@ -165,13 +210,11 @@ $('#navbar li a[data-value=tab3]').hide();
         <span>the</span>
         <span>key</span>
         <span>predictors</span>
-        <span>limits</span>
         <span>of</span>
         <span>the</span>
         <span>phenomenon</span>
         <span>of</span>
-        <span>Churn</span>
-        <span>.,</span>
+        <span>Churn.</span>
         <span>The</span>
         <span>rate</span>
         <span>of</span>
@@ -187,7 +230,9 @@ $('#navbar li a[data-value=tab3]').hide();
         <span>that</span>
         <span>are</span>
         <span>leaving.</span>
-          </h1>"),
+        <span></span>
+        <span></span>
+          </h1></div>"),
              
              
              
@@ -204,10 +249,9 @@ $('#navbar li a[data-value=tab3]').hide();
     
     ),
     tabPanel(title="Start Page",
-            value = "tab2",
-    
+           
              
-             HTML("<h2 class='glowIn'>Most Important Variables</h2>"),
+             
              
             tags$span(
             class = "more", 
@@ -292,7 +336,7 @@ $('#navbar li a[data-value=tab3]').hide();
                
                
                
-               selectInput(inputId="HIGHCHARTCHOICE", label="Select Plot:", choices =c("Count Compare", "Churn Proportion Variation", "Churn Count Variation", "Electronic Count", "Multiple Lines",  "InternetService Variation"),  selected = "Churn Proportion Variation", width =  '350px'),  
+               selectInput(inputId="HIGHCHARTCHOICE", label="Select Plot:", choices =c("Count Compare", "Churn Proportion Variation", "Churn Count Variation", "Electronic Count", "Multiple Lines",  "InternetService Variation"),  selected = "Count Compare", width =  '350px'),  
                
                sliderInput("MonthlyChargesInput", "Monthly Charges",  min = min(train_data$MonthlyCharges), max = max(train_data$MonthlyCharges) , c(min(train_data$MonthlyCharges), max = max(train_data$MonthlyCharges)),
                            pre = "$"),
@@ -320,10 +364,10 @@ $('#navbar li a[data-value=tab3]').hide();
                
                
                
-               
                br(),
-               
-               withSpinner(highchartOutput("HIGHCHARTOPT", height = "170%", width="110%")),  
+               br(),
+               br(),
+               withSpinner(highchartOutput("HIGHCHARTOPT", height = "200%", width="110%")),  
                br(),
                
                
@@ -353,7 +397,7 @@ $('#navbar li a[data-value=tab3]').hide();
     ),
     
     tabPanel("Key Variables",
-             sidebarPanel(
+             sidebarPanel(width = 3,
                
                
                
@@ -372,7 +416,7 @@ $('#navbar li a[data-value=tab3]').hide();
                
                
                #moving text effect
-               HTML("<h2 class='glowIn'>Most Important Variables</h2>"),
+               HTML("<h2 style='text-align:center' class='shiny'>Most Important Variables</h2>"),
                   
                #<button class="glow-on-hover" type="button">HOVER ME, THEN CLICK ME!</button>
                hr(),
@@ -397,7 +441,7 @@ $('#navbar li a[data-value=tab3]').hide();
     ),
     
     tabPanel("ALE Plots",
-             sidebarPanel(
+             sidebarPanel(width=3,
                
                
                
@@ -418,8 +462,8 @@ $('#navbar li a[data-value=tab3]').hide();
                
              ),
              mainPanel(
+               HTML("<h2 style='text-align: center;'>ALE plot insight</h2>"),
                
-               tags$h2("ALE plot insight!"),
                #HTML("<div class='button'>HOVER ME</div>"),
                hr(),
                
@@ -429,7 +473,7 @@ $('#navbar li a[data-value=tab3]').hide();
                
                
                br(),
-               withSpinner(plotOutput("ACCUMULATEDDEPENDENCE", height="100px")), 
+               withSpinner(plotOutput("ACCUMULATEDDEPENDENCE", height="400px")), 
                
              
                
@@ -456,12 +500,12 @@ $('#navbar li a[data-value=tab3]').hide();
              verticalLayout(
              ),
              sidebarLayout(
-               sidebarPanel(
+               sidebarPanel(width=3,
                  
                  
                  
                  radioButtons("plot_features",
-                              label = HTML('<FONT color="#BB86FC"><FONT size="6pt">Select model type:</FONT></FONT>'),
+                              label = HTML('<FONT color="#21F8F6"><FONT size="5pt">Select model type:</FONT></FONT>'),
                               choices =  c("Random_Forest","Random_Forest_Up","Xgb_Up"),
                               selected = "Random_Forest",
                               inline = T,
@@ -483,8 +527,11 @@ $('#navbar li a[data-value=tab3]').hide();
                  
                  
                  br(),
+                 HTML("<h2 style='text-align: center;'>Breakdown Profiles</h2>"),
                  
-                 tags$h2("Breakdown Profiles"),
+                
+                   
+                 
                  hr(),
                  
                  
@@ -492,7 +539,7 @@ $('#navbar li a[data-value=tab3]').hide();
                  
                  
                  br(),
-                 withSpinner(plotOutput("EASIER", height="100px")), 
+                 withSpinner(plotOutput("EASIER", height="400px")), 
                  
                  
                  
@@ -501,22 +548,22 @@ $('#navbar li a[data-value=tab3]').hide();
                  
                  htmlOutput("DESCRIBEVARY"),
                  
-                 
                  br(),
-                 h2("What are Breakdown Plots conveying?"),
+                 br(),
+                 HTML("<h2 style='text-align: center;'>What are Breakdown Plots conveying?</h2>"),
                  hr(),
                  tags$span(
                    class = "more", 
                    ("
                       There are two broad types of model explanatory tools, namely local and global. For instance,
-                      ALE plots yield an overall understanding of a model's predictions aggregated over an entire dataset.
-                      The breakdown algorithm provides local explanations: in other words, they help provide information
-                      about a prediction for a single observation. This algorithm helps unveil which particular variables
-                      contribute the most to a specific observation/prediction. From the top down of the breakdown plots 
-                      featured above: the intercept row indicates the overall mean value of predictions for the model when 
-                      trained on the entire dataset. The green and red bars signify the contribution of each variable 
-                      towards the overall prediction. Red bars indicate that the respective variable decreases the probability 
-                      that the particular customer will churn, whereas green bars represent variables that increase the 
+                      ALE plots are a form of global explanation in that they yield an overall understanding of a model's 
+                      predictions aggregated over an entire dataset. Whereas, the breakdown algorithm provides local explan-
+                      ations: in other words, they help provide information about a prediction for a single observation. This 
+                      algorithm helps unveil which particular variables contribute the most to specific observations/predictions. 
+                      Visually inspecting the breakdown plots featured above: the intercept row indicates the overall mean value 
+                      of predictions for the model when trained on the entire dataset. The green and red bars signify the contribution 
+                      of each variable towards the overall prediction. Red bars indicate that the respective variable decreases the 
+                      probability that the particular customer will churn, whereas green bars represent variables that increase the 
                       likelihood a customer will churn. The purple bar shows the prediction for the particular customer in 
                       question. The numerical values capture the extent of influence of respective variables.")),
                  
@@ -552,37 +599,40 @@ $('#navbar li a[data-value=tab3]').hide();
     tabPanel("New Predictions",
              fluidPage(
                
-               tags$h2("Select a model, and enjoy making new predictions!"),
+               #tags$h2("Select a model, and enjoy making new predictions!"),
+               HTML("<h2 class='shiny'>Test Results</h2>"),
                
                
                hr(),
-               fluidRow(column(12, div(actionButton("metricmessage", icon("info"), style="color: #fff; width:70px; height:80px; background-color: #9D00FF; border-color: #2e6da4"), style = "float: right"))),                                  
-               
+               #fluidRow(column(12, div(actionButton("metricmessage", icon("info"), style="color: #fff; width:70px; height:80px; background-color: #9D00FF; border-color: #2e6da4"), style = "float: right"))),                                  
+               fluidRow(column(12, div(shiny::actionButton("metricmessage", class='glow-on-hover',
+                                                           label='Info', width = "50px",
+                                                           style = 'float: right')))),
                br(),
                
                
                
                
                
-               fluidRow(
-                 column(3, offset=4,tags$b("Performance results from test data shown below!"),)),
-               textOutput('greeting'),
+               #fluidRow(
+                # column(3, offset=4,tags$b("Performance results from test data shown below!"),)),
+               #textOutput('greeting'),
                br(),
                #tags$h3(class="shiny","Predicted Probability of Churn:"),
                #textOutput(outputId = "forlabelresult"),
                
                fluidRow(
                  column(2, radioButtons(inputId = "MODELCHOICE",
-                                        label = HTML('<FONT color="#BB86FC"><FONT size="6pt">Select model:</FONT></FONT>'),
+                                        label = HTML('<FONT color="#21F8F6"><FONT size="5pt">Select model:</FONT></FONT>'),
                                         choices = c("RANDOM_FOREST","RF_UP","XGB_UP"))),
                  
                  
                  #column(1, offset=1, withAnim(),
                  #div( id = 'shinyLogo', tags$img(src= "https://hineon.com/wp-content/uploads/2019/09/neon-arrow.jpg", width = "100px", height = "100px"))),      
                  
-                 column(6, offset=2, withSpinner(plotOutput("PlotResults", width = "500px", height = "300px"))),
+                 column(6, offset=2, withSpinner(plotOutput("PlotResults", width = "600px", height = "300px"))),
                  
-                 
+                 br(),
                  
                  
                  
@@ -593,12 +643,13 @@ $('#navbar li a[data-value=tab3]').hide();
                
                hr(),
                
+               HTML("<h2>Make informed predictions!</h2>"),
                fluidRow(
                  column(3, #offset = 1,
                         
-                        h4(class="glow","Predicted Probaility of Churn:"),
+                        h4(class="glow","Predicted Probability of Churn:"),
                         #textOutput(outputId = "forlabelresult"),
-                        withSpinner(gaugeOutput("GAUGER", width = "300px", height = "100px")),
+                        withSpinner(gaugeOutput("GAUGER", width = "200px", height = "100px")),
                         br(),
                         #textOutput(outputId = "forlabelresult"),
                         htmlOutput("some_text"),
@@ -672,5 +723,4 @@ $('#navbar li a[data-value=tab3]').hide();
   
   
 )
-
 
