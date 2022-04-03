@@ -132,7 +132,7 @@ server <- function(input, output, session) {
     output$some_text <- renderText({ 
       
       if(pred_result()[[2]] < 0.5){
-        return(paste("<span style=\"color:green\">The model predicts that customer will stay</span>"))
+        return(paste("<span style=\"color:#21F8F6\">The model predicts that customer will stay</span>"))
         
       }else{
         return(paste("<span style=\"color:red\">The model predicts that customer will leave</span>"))
@@ -514,11 +514,19 @@ server <- function(input, output, session) {
     
     
     #delay appearance of TABWELCOME
-    #delay(7000, runjs("$('#navbar li a[data-value=TABWELCOME]').hide();"))
+    delay(6000, runjs("$('#navbar li a[data-value=TABWELCOME]').show();"))
+    
+    #delay appearance of STARTPAGETAB
+    delay(7000, runjs("$('#navbar li a[data-value=STARTPAGETAB]').show();"))
+    
+   
+    #delay appearance of VISUALSTAB
+    delay(8000, runjs("$('#navbar li a[data-value=STARTPAGETAB]').show();"))
     
     
     
-   # observe({
+    
+    # observe({
     #    if(!is.na(input$PaymentMethodChoice) & input$PaymentMethodChoice != "Electronic Count"){color <- "solid #DAF7A6"} else {color <- ""}
    #     runjs(paste0("document.getElementById('PaymentMethodChoice').style.border ='", color ,"'"))
    # })
