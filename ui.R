@@ -78,7 +78,101 @@ CSS <- "
 
 
 
+JS2<-'//sometimes needs a refresh...
 
+const canvas = document.querySelector("canvas");
+const img = document.querySelector("img");
+const c = canvas.getContext("2d");
+
+imgStroke = c.createPattern(img, "no-repeat");
+
+imgStroke.set;
+
+canvas.width = 512;
+canvas.height = 513;
+
+function randomIntFromRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function randomIntFromRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function randomRgbValue() {
+  const red = randomIntFromRange(41, 44);
+  const green = randomIntFromRange(62, 128);
+  const blue = randomIntFromRange(80, 185);
+
+  return `rgba(${red},${green},${blue},1)`;
+}
+
+function Particle(x, y, radius, color) {
+  this.x = x;
+  this.y = y;
+  this.radius = radius;
+  this.color = color;
+  this.radians = Math.random() * Math.PI * 2;
+  this.velocity = 0.05;
+  this.distanceFromCenter =
+    //this for 2d randomIntFromRange(50, 220);
+    // this makes 3D
+    { x: randomIntFromRange(0, 200), y: randomIntFromRange(0, 200) };
+
+  this.update = () => {
+    //move points over time
+    const lastPoint = { x: this.x, y: this.y };
+    this.radians += this.velocity;
+    this.x = x + Math.cos(this.radians) * this.distanceFromCenter.x;
+    this.y = y + Math.sin(this.radians) * this.distanceFromCenter.y;
+    this.draw(lastPoint);
+  };
+
+  this.draw = (lastPoint) => {
+    c.beginPath();
+    c.strokeStyle = imgStroke;
+    c.lineWidth = this.radius;
+    c.moveTo(lastPoint.x, lastPoint.y); //prev frame
+    c.lineTo(this.x, this.y); // next frame
+    c.stroke();
+    // c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    // c.fillStyle = this.color;
+    // c.fill();
+    c.closePath();
+  };
+}
+
+let particles;
+function init() {
+  particles = [];
+
+  for (let i = 0; i < 400; i++) {
+    const radius = Math.random * 2 + 1;
+    const color = randomRgbValue();
+    console.log(color);
+    particles.push(
+      new Particle(canvas.width / 2, canvas.height / 2, radius, color)
+    );
+  }
+}
+
+//animate loop
+function animate() {
+  requestAnimationFrame(animate);
+  c.fillStyle = "rgba(0, 0, 0, 0.05)";
+  //below clears screen ever rerender, try commenting when clearRect, fill rect gives tails
+  //c.fillStyle = imgStroke;
+  c.fillRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((particle) => {
+    particle.update();
+  });
+}
+
+init();
+animate();
+
+}'
 
 
 
@@ -89,7 +183,7 @@ CSS <- "
 JS <- '
 $(document).ready(function() {
     // Configure/customize these variables.
-    var showChar = 180;  // How many characters are shown by default
+    var showChar = 100;  // How many characters are shown by default
     var ellipsestext = "...";
     var moretext = "Show more >";
     var lesstext = "Show less";
@@ -144,7 +238,7 @@ ui<-fluidPage(
   
       tags$style(HTML(CSS)), 
       tags$script(HTML(JS)),
-    
+      tags$script(HTML(JS2)),
     
     
   
@@ -161,10 +255,14 @@ tags$head(HTML("<script type='text/javascript'>
 
 shinyjs.init=function() {
  
-
-$('#navbar li a[data-value=TABWELCOME]').show();
-
-
+const navbar = document.querySelector('.nav-fixed');
+window.onscroll = () => {
+    if (window.scrollY > 300) {
+        navbar.classList.add('nav-active');
+    } else {
+        navbar.classList.remove('nav-active');
+    }
+};
 }
 </script>")),
 
@@ -234,7 +332,8 @@ $('#navbar li a[data-value=TABWELCOME]').show();
         <span></span>
           </h1></div>"),
              
-             
+        
+        
              
              
              
@@ -249,8 +348,19 @@ $('#navbar li a[data-value=TABWELCOME]').show();
     
     ),
     tabPanel(title="Start Page",
-           
+             value="STARTPAGETAB",
              
+             br(),
+             br(),
+             
+             HTML("
+                  <div class='zebra'>
+  <h1>WELCOME</h1>
+</div>
+
+               "),
+
+	
              
              
             tags$span(
@@ -283,8 +393,8 @@ $('#navbar li a[data-value=TABWELCOME]').show();
           <li> XGB_UP - Extreme Gradient Boosting, a type of tree-based algorithm that was trained using upsampled data</li> 
           <li> Random_Forest_Up - Random Forest algorithm trained on upsampled data</li>
           </ul>
-                       
-               
+          
+          
                        
                        
               
@@ -317,7 +427,7 @@ $('#navbar li a[data-value=TABWELCOME]').show();
        
     
     tabPanel(title="Visuals",
-             value="tab3",
+             value="VISUALTAB",
          
              sidebarPanel(width = 3,
                
@@ -367,7 +477,7 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                br(),
                br(),
                br(),
-               withSpinner(highchartOutput("HIGHCHARTOPT", height = "200%", width="110%")),  
+               withSpinner(highchartOutput("HIGHCHARTOPT", height = "400%", width="115%")),  
                br(),
                
                
@@ -427,6 +537,7 @@ $('#navbar li a[data-value=TABWELCOME]').show();
  style = 'float: right')))),
                                                     
                br(),
+               br(),
                plotOutput("PlotImportance"),
                br(),
                
@@ -482,13 +593,13 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                hr(),
                
             HTML("<p>
-                  Accumulated local effects (ALE) illustate how variables impact the predicted outcome of an machine learning algorithm on average.
+                  Accumulated local effects (ALE) illustate how variables impact the predicted outcome of a machine learning model on average.
                   For numerical variables, the ALE algorithm averages the difference in small windows of a variable's range. ALE graphs are centered 
-                  at 0.If the reading for variable X, at the point X=3, translates as -4, this can roughly be interpreted as indicating that the 
+                  at 0.If the reading on the X-axis, at the point X=3 translates as -4, this can roughly be interpreted as indicating that the 
                   prediction at this value is lower than the average prediction by 4 units. In a nutshell, ALE plots illustate how the predictions of 
                   a machine learning model alter between subsections of an independent variable's overall range. The impact of categorical features can 
-                  be similarly interpreted: each bar indicates the modification in the model's predicition when the respective feature possesses the 
-                  respective property.</p> " ),
+                  be similarly interpreted: each bar represents the average modification in the model's predicition when the respective feature is present 
+                  .</p>"),
                
                
                
@@ -515,7 +626,7 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                  
                  
                  numericInput(inputId="row_index",
-                              label= "Select customer (1-5000)",
+                              label= HTML("<p>Select customer <br> (1-5000)</p>"),
                               value=1,
                               min=1, max=20,  width = '150px')  
                  
@@ -554,18 +665,17 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                  hr(),
                  tags$span(
                    class = "more", 
-                   ("
-                      There are two broad types of model explanatory tools, namely local and global. For instance,
+                  ("  There are two broad types of model explanatory tools, namely local and global. For instance,
                       ALE plots are a form of global explanation in that they yield an overall understanding of a model's 
-                      predictions aggregated over an entire dataset. Whereas, the breakdown algorithm provides local explan-
-                      ations: in other words, they help provide information about a prediction for a single observation. This 
-                      algorithm helps unveil which particular variables contribute the most to specific observations/predictions. 
-                      Visually inspecting the breakdown plots featured above: the intercept row indicates the overall mean value 
-                      of predictions for the model when trained on the entire dataset. The green and red bars signify the contribution 
+                      predictions aggregated over an entire dataset. Alternatively, the breakdown algorithm provides local explan-
+                      ations: in other words, this algorithm provides information in relation to a single observation/customer. The breakdown 
+                      algorithm helps unveil which particular variables contribute the most to a specific observation/prediction. 
+                      The breakdown plots featured above can be interpreted as follows: the intercept row indicates the overall mean value 
+                      of predictions for a model when trained on the entire dataset. The green and red bars signify the relative contribution 
                       of each variable towards the overall prediction. Red bars indicate that the respective variable decreases the 
-                      probability that the particular customer will churn, whereas green bars represent variables that increase the 
-                      likelihood a customer will churn. The purple bar shows the prediction for the particular customer in 
-                      question. The numerical values capture the extent of influence of respective variables.")),
+                      probability that a particular customer will churn, whereas green bars represent variables that increase the 
+                      likelihood a customer will churn. The purple bar shows the prediction for the particular customer being evaluated 
+                       .")),
                  
                  
                )  
@@ -643,11 +753,12 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                
                hr(),
                
-               HTML("<h2>Make informed predictions!</h2>"),
+               HTML("<h4>Make informed predictions!</h2>"),
+               
                fluidRow(
                  column(3, #offset = 1,
                         
-                        h4(class="glow","Predicted Probability of Churn:"),
+                        h4(class="glow","Probability of Churn:"),
                         #textOutput(outputId = "forlabelresult"),
                         withSpinner(gaugeOutput("GAUGER", width = "200px", height = "100px")),
                         br(),
@@ -657,9 +768,10 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                         #radioButtons(inputId = "MODELCHOICE",
                         #label = HTML('<FONT color="#9B59F6"><FONT size="5pt">Select model type</FONT></FONT>'),
                         #choices = c("RANDOM_FOREST","RF_UP","XGB_UP")),
-                        
-                        selectInput(inputId="PaperlessBillingChoice", label="Paperless Billing:", choices =levels(train_data$PaperlessBilling),  selected = "Yes", width =  '100px'),  
                         selectInput(inputId="PaymentMethodChoice", label="Payment Method:", choices =levels(train_data$PaymentMethod),  selected = "Electronic Count", width =  '100px'),
+                        selectInput(inputId="PaperlessBillingChoice", label="Paperless Billing:", choices =levels(train_data$PaperlessBilling),  selected = "Yes", width =  '100px'),  
+                        
+                        
                         
                         
                         
@@ -711,8 +823,8 @@ $('#navbar li a[data-value=TABWELCOME]').show();
                  br(),
                  
                  p("This web application was designed and built by",
-                   span("Gamal Gabr", style = "color:orange"),
-                   ". If you would like me to build you a customised app, please feel free to contact me via", span ("gamal.gabr444@outlook.com", style = "color:orange")),
+                   span("Gamal Gabr", style = "color:#21F8F6"),
+                   ". If you would like me to build you a customised app, please feel free to contact me via", span ("gamal.gabr444@outlook.com", style = "color:#21F8F6")),
                  
                )
                
@@ -723,4 +835,3 @@ $('#navbar li a[data-value=TABWELCOME]').show();
   
   
 )
-
