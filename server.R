@@ -12,19 +12,12 @@ train_data<-readRDS("churnnew2.rds")
 #train_data<-readRDS("train_data.rds")
 
 
-server <- function(input, output, session) {
-    
-    
-    
-  
- 
 
-  
-  
-  
-  
-  
-    
+
+
+# Define server logic required to draw a histogram
+shinyServer(function(input, output) {
+
     
     #observe(addHoverAnim(session, 'shinyLogo', 'pulse'))
     
@@ -47,7 +40,7 @@ server <- function(input, output, session) {
         
     })
     
-                                              
+    
     
     
     
@@ -66,84 +59,78 @@ server <- function(input, output, session) {
     })
     
     
-   
+    
     
     #apply break_down algorithm for models
     output$EASIER <- renderPlot({
-      
-      req(input$row_index)
-      
-      
-      
-      
-      if (input$plot_features == "Random_Forest") {  
+        
+        req(input$row_index)
         
         
         
-        randomf_features <- break_down(explainer_rf,
-                                      train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
         
-        plot(randomf_features)
+        if (input$plot_features == "Random_Forest") {  
+            
+            
+            
+            randomf_features <- break_down(explainer_rf,
+                                           train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
+            
+            plot(randomf_features)
+            
+            
+        } else if (input$plot_features == "Random_Forest_Up") { randomfUP_features <- break_down(explainer_rfup,
+                                                                                                 train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
+        plot(randomfUP_features)   } else if (input$plot_features == "Xgb_Up") { xgbUP_features <- break_down(explainer_rfup,
+                                                                                                              train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
+        plot(xgbUP_features)
         
         
-      } else if (input$plot_features == "Random_Forest_Up") { randomfUP_features <- break_down(explainer_rfup,
-                                                                                      train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
-      plot(randomfUP_features)   } else if (input$plot_features == "Xgb_Up") { xgbUP_features <- break_down(explainer_rfup,
-                                                                                                                          train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
-      plot(xgbUP_features)
-      
-      
-      
-      
-      
-      
-      
-      } })
+        
+        
+        
+        
+        
+        } })
     
     
     
     
     #apply break_down algorithm for models
     output$ACCUMULATEDDEPENDENCE <- renderPlot({
-      
-      
+        
+        
         req(input$VariableOPT)
         
-      
-      
-      
-      
-      rf <- accumulated_dependence(explainer_rf, variables = input$VariableOPT)
+        
+        
+        
+        
+        rf <- accumulated_dependence(explainer_rf, variables = input$VariableOPT)
         rf_up<- accumulated_dependence(explainer_rfup, variables = input$VariableOPT)
         XGB_up<- accumulated_dependence(explainer_xgbup, variables = input$VariableOPT)
         
         plot(rf, rf_up, XGB_up)+
-          ggtitle("ALE profiles")
+            ggtitle("ALE profiles")
         
     })
-        
-      
-      
-      
+    
+    
+    
+    
     
     
     
     #conditional colour change of text based on prediction
     output$some_text <- renderText({ 
-      
-      if(pred_result()[[2]] < 0.5){
-        return(paste("<span style=\"color:#21F8F6\">The model predicts that customer will stay</span>"))
         
-      }else{
-        return(paste("<span style=\"color:red\">The model predicts that customer will leave</span>"))
-      }
+        if(pred_result()[[2]] < 0.5){
+            return(paste("<span style=\"color:#21F8F6\">The model predicts that customer will stay</span>"))
+            
+        }else{
+            return(paste("<span style=\"color:red\">The model predicts that customer will leave</span>"))
+        }
     })
-   
-      
-      
-      
-      
-      
     
     
     
@@ -164,51 +151,58 @@ server <- function(input, output, session) {
     
     
     
-     #provide descriptions for break_down algorithm
+    
+    
+    
+    
+    
+    
+    #provide descriptions for break_down algorithm
     output$DESCRIBEVARY<-renderUI({
-      
-      req(input$row_index)
-      
-      if (input$plot_features == "Random_Forest") {
+        
+        req(input$row_index)
+        
+        if (input$plot_features == "Random_Forest") {
+            
+            
+            brd_da11 <- break_down(explainer_rf, train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
+            br()
+            HTML(paste(strong("Summary of above:"),  
+                       br(),
+                       describe(brd_da11,
+                                label = "the probability of the customer leaving equates to:",
+                                short_description = FALSE,
+                                display_values =  TRUE,
+                                display_numbers = TRUE,
+                                display_distribution_details = FALSE)))
+            
+        } else if (input$plot_features == "Random_Forest_Up") {
+            
+            
+            brd_da22 <- break_down(explainer_rfup, train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
+            br()
+            HTML(paste(strong("Summary of above:"),  
+                       br(),
+                       br(),
+                       describe(brd_da22,
+                                short_description = FALSE,
+                                display_values =  TRUE,
+                                display_numbers = TRUE,
+                                display_distribution_details = FALSE)))  } else if (input$plot_features == "Xgb_Up") {
+                                    
+                                    
+                                    brd_da22 <- break_down(explainer_xgbup, train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
+                                    br()
+                                    HTML(paste(strong("Summary of above:"),  
+                                               br(),
+                                               describe(brd_da22,
+                                                        short_description = FALSE,
+                                                        display_values =  TRUE,
+                                                        display_numbers = TRUE,
+                                                        display_distribution_details = FALSE)))  }
         
         
-        brd_da11 <- break_down(explainer_rf, train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
-        br()
-        HTML(paste(strong("Summary of above:"),  
-                   br(),
-                   describe(brd_da11,
-                            label = "the probability of the customer leaving equates to:",
-                            short_description = FALSE,
-                            display_values =  TRUE,
-                            display_numbers = TRUE,
-                            display_distribution_details = FALSE)))
         
-      } else if (input$plot_features == "Random_Forest_Up") {
-        
-        
-        brd_da22 <- break_down(explainer_rfup, train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
-        br()
-        HTML(paste(strong("Summary of above:"),  
-                   br(),
-                   describe(brd_da22,
-                            short_description = FALSE,
-                            display_values =  TRUE,
-                            display_numbers = TRUE,
-                            display_distribution_details = FALSE)))  } else if (input$plot_features == "Xgb_Up") {
-                              
-                              
-                              brd_da22 <- break_down(explainer_xgbup, train_data[input$row_index, ], check_interactions = FALSE, keep_distributions = TRUE)
-                              br()
-                              HTML(paste(strong("Summary of above:"),  
-                                         br(),
-                                         describe(brd_da22,
-                                                  short_description = FALSE,
-                                                  display_values =  TRUE,
-                                                  display_numbers = TRUE,
-                                                  display_distribution_details = FALSE)))  }
-      
-      
-      
     })
     
     
@@ -289,7 +283,7 @@ server <- function(input, output, session) {
     #create reactive data frame
     filtered <- reactive({
         train_data %>%
-      filter(MonthlyCharges >= input$MonthlyChargesInput[1],
+            filter(MonthlyCharges >= input$MonthlyChargesInput[1],
                    MonthlyCharges <= input$MonthlyChargesInput[2],
                    TotalCharges >= input$TotalChargesInput[1],
                    TotalCharges <= input$TotalChargesInput[2],
@@ -423,9 +417,9 @@ server <- function(input, output, session) {
                     hc_exporting(enabled = FALSE)%>%
                     hc_add_theme(hc_theme_chalk())%>% hc_title(
                         text = "Percentage of Churn/Remain"
-                    )  } else if (input$HIGHCHARTCHOICE=="Count Compare") {mpgman2 <- dplyr::count(filtered(), PaymentMethod, Churn)
+                    )  } else if (input$HIGHCHARTCHOICE=="Count Compare") {countcomp <- dplyr::count(filtered(), PaymentMethod, Churn)
                     
-                    hchart(mpgman2,type = "column", hcaes(x = PaymentMethod, y = n, group = Churn), color = c("#401482", "#ce8021"))%>%
+                    hchart(countcomp,type = "column", hcaes(x = PaymentMethod, y = n, group = Churn), color = c("#401482", "#ce8021"))%>%
                         hc_exporting(enabled = FALSE)%>%
                         hc_add_theme(hc_theme_chalk())%>% hc_title(
                             text = "Payment Method Variation"
@@ -519,7 +513,7 @@ server <- function(input, output, session) {
     #delay appearance of STARTPAGETAB
     delay(7000, runjs("$('#navbar li a[data-value=STARTPAGETAB]').show();"))
     
-   
+    
     #delay appearance of VISUALSTAB
     delay(8000, runjs("$('#navbar li a[data-value=STARTPAGETAB]').show();"))
     
@@ -528,8 +522,8 @@ server <- function(input, output, session) {
     
     # observe({
     #    if(!is.na(input$PaymentMethodChoice) & input$PaymentMethodChoice != "Electronic Count"){color <- "solid #DAF7A6"} else {color <- ""}
-   #     runjs(paste0("document.getElementById('PaymentMethodChoice').style.border ='", color ,"'"))
-   # })
+    #     runjs(paste0("document.getElementById('PaymentMethodChoice').style.border ='", color ,"'"))
+    # })
     
     
     
@@ -582,7 +576,7 @@ server <- function(input, output, session) {
             
             RF_IMP_PLOT  } else if (input$VARIABLE_IMPORTANCE_COMP == "Random Forest Up") {
                 
-              RF_UP_IMP_PLOT}   else if (input$VARIABLE_IMPORTANCE_COMP == "XGB Up")
+                RF_UP_IMP_PLOT}   else if (input$VARIABLE_IMPORTANCE_COMP == "XGB Up")
                     
                 { XGB_UP_IMP_PLOT}
     })
@@ -607,7 +601,7 @@ server <- function(input, output, session) {
     
     
     
- 
+    
     
     
     
@@ -623,7 +617,8 @@ server <- function(input, output, session) {
         shinyalert::shinyalert(title = 'Alert', className = 'alert')
     })
     
-}
+})
+
 
 
 
