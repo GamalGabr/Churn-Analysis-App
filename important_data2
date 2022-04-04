@@ -1,0 +1,104 @@
+#RFUp_model<-readRDS("~ChurnRate/rfup_model.rds")
+
+#rf_model<-readRDS("~ChurnRate/rf_model.rds")
+
+#XGBUP_model<-readRDS("~ChurnRate/xgbup_model.rds")
+
+#"C:\Users\gamal\Documents\ChurnRate\rfup_model.rds"
+
+
+
+
+XGB_UP_RESULTS<-readRDS("resultsbarxgbup2.rds")
+RF_RESULTS<-readRDS("resultsbarrf.rds")
+RF_UP_RESULTS<-readRDS("resultsbarrfup2.rds")
+
+
+
+explainer_rf<-readRDS("explainer_rf.rds")
+explainer_rfup<-readRDS("explainer_rfup.rds")
+explainer_xgbup<-readRDS("explainer_xgb_up.rds")
+
+
+
+XGB_UP_IMP_PLOT<-readRDS("XGB_UP_IMP_PLOT.rds")
+RF_UP_IMP_PLOT<-readRDS("RF_UP_IMP_PLOT.rds")
+RF_IMP_PLOT<-readRDS("RF_IMP_PLOT.rds")
+
+
+
+f_3 <- function(x) {
+  if (x > 0.5) {
+    result <- "Model predicts that customer will leave"
+  }
+  else if (x < 0.5) {
+    result <- "Model predicts that customer will remain"
+  }
+  else {
+    result <- "Unclear"
+  }
+  result
+}
+
+
+
+
+
+
+
+
+train_data<-readRDS("churnnew2.rds")
+
+
+
+
+
+#train_data<-readRDS("train_data.rds")
+
+
+
+
+
+factorCols <- sapply(train_data, is.factor)
+factorDF <- train_data[,factorCols]
+
+numericCols<-sapply(train_data, is.numeric)
+numericDF<-train_data[,numericCols]
+
+
+
+#second visual theme
+theme_easy <- function (base_size = 12, base_family = "") {
+  theme_gray(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      axis.text = element_text(colour = "white"),
+      axis.title.x = element_text(colour = "white", size=rel(3)),
+      axis.title.y = element_text(colour = "#5ec962", angle=45),
+      panel.background = element_rect(fill="#21918c"),
+      panel.grid.minor.y = element_line(size=3),
+      panel.grid.major = element_line(colour = "grey"),
+      plot.background = element_rect(fill="#440154")
+    )  
+}
+
+#visual theme
+theme_smooth <- function(base_family="Roboto Condensed",
+                        ticks=TRUE,axis=TRUE,grid=""){
+  ret <- theme_bw()+
+    theme(panel.background = element_rect(fill="#666666",colour = "#666666"),
+          plot.background = element_rect(fill="#666666",colour = "#666666"),
+          
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_blank(),
+          axis.line = element_line(colour="white"),
+          panel.border = element_rect(fill=NA,colour="#666666"),
+          legend.background = element_rect(fill="#666666",colour = "#666666"),
+          legend.box.background = element_rect(fill="#666666",colour = "#666666"),
+          legend.key = element_rect(fill="#666666",colour = "#666666"),
+          legend.text = element_text(family = base_family,colour="white",size=rel(1.1)),
+          axis.text = element_text(colour="white",size=rel(0.9),family=base_family),
+          axis.title = element_text(family = base_family,colour="white",size=rel(1.1)),
+          legend.position = NULL,
+          plot.title = element_text(family = base_family,color="white",face = "bold",size=rel(1.5)),
+          plot.subtitle = element_text(family = base_family,color="white"))}
+
