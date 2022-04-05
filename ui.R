@@ -36,13 +36,13 @@ source("css_churn2.R")
 source("important_data2.R")
 
 
-library(shiny)
 
 
 
 
 
-CSS <- "
+#to be used in the less/more read function
+TEXT_FOLD <- "
 .morecontent span {
     display: none;
 }
@@ -51,32 +51,7 @@ CSS <- "
 }
 "
 
-
-
-
-
-#jscode<-"shinyjs.init=function() {
-
-#"$('#navbar li a[data-value=TABWELCOME]').hide();});
-
-#}"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-JS <- '
+JAVA_ADD <- '
 $(document).ready(function() {
     // Configure/customize these variables.
     var showChar = 143;  // How many characters are shown by default
@@ -112,70 +87,17 @@ $(document).ready(function() {
 '
 
 
-JS2 <- '
-
-
-
-'
-
-
-
-
-
-
-
-
-
-#my_theme <- bs_theme(bootswatch = "darkly",
-#base_font = font_google("Righteous"))
-
-# Let thematic know to update the fonts, too
-#thematic_shiny(font = "auto")
-
-
 
 shinyUI(fluidPage(
     
-
-
-    tags$style(HTML(CSS)), 
-    tags$script(HTML(JS)),
-    #tags$script(HTML(JS2)),
-    
-    
-    
-    
-    #theme = bslib::bs_theme(bootswatch = "darkly"),
-    #theme = shinytheme("cyborg"),
+    #call scripts from above
+    tags$style(HTML(TEXT_FOLD)), 
+    tags$script(HTML(JAVA_ADD)),
+  
+    #call primary css script for decoration
     tags$style(cssUPGRADE),
-    # Pass that theme object to UI function
-    #theme = my_theme,
-    #extendShinyjs(text = jscode, functions = "init"),
     
-    useShinyjs(),
-    tags$head(HTML("<script type='text/javascript'>
-
-shinyjs.init=function() {
- 
-const navbar = document.querySelector('.nav-fixed');
-window.onscroll = () => {
-    if (window.scrollY > 300) {
-        navbar.classList.add('nav-active');
-    } else {
-        navbar.classList.remove('nav-active');
-    }
-};
-}
-</script>")),
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    #recruit Shinyjs
     useShinyjs(),
     
     useShinyalert(force=TRUE),
@@ -185,15 +107,6 @@ window.onscroll = () => {
         "Churn Analytics",
         tabPanel(title = "Welcome",      
                  value="TABWELCOME",
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
                  br(),
                  br(),
                  br(),
@@ -238,41 +151,15 @@ window.onscroll = () => {
         <span></span>
          </h1></div>"),
         
-        
-        
-        
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
         ),
         tabPanel(title="Start Page",
                  value="STARTPAGETAB",
-                 
-                 
-                 
-                 HTML("
-                  <div class='zebra'>
-  <h1>WELCOME</h1>
-</div>
-
-               "),
+          HTML("<div class='zebra'><h1>WELCOME</h1></div>"),
                  
                  HTML("<br>"),
                  HTML("<br>"),
                  
-                 
+                 #primary introduction
                  tags$span(
                      class = "more", 
                      HTML( "Welcome to this Churn analysis app! The original IBM dataset contained the information of 7043 
@@ -304,56 +191,14 @@ window.onscroll = () => {
           <li> Random_Forest_Up - Random Forest algorithm trained on upsampled data</li>
           </ul>
           
-          
-                       
-                       
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              
-              " )),
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
-                 
+        " )),
         ),
-        
-        
-        
         tabPanel(title="Visuals",
                  value="VISUALTAB",
                  
                  sidebarPanel(width = 3,
-                              
+                              #set colour of side panels
                               tags$style(".well {background-color: #808080  ;}"),
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
                               
                               
                               selectInput(inputId="HIGHCHARTCHOICE", label="Select Plot:", choices =c("Count Compare", "Churn Proportion Variation", "Churn Count Variation", "Electronic Count", "Multiple Lines",  "InternetService Variation"),  selected = "Count Compare", width =  '350px'),  
@@ -370,48 +215,15 @@ window.onscroll = () => {
                                           pre = "Months"),
                               
                               
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
-                              
                  ),
                  mainPanel(
-                     
-                     
                      
                      br(),
                      br(),
                      br(),
                      withSpinner(highchartOutput("HIGHCHARTOPT", height = "700%", width="115%")),  
                      br(),
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
                      br(),
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
-                     
                      
                  )
         ),
@@ -425,11 +237,6 @@ window.onscroll = () => {
                                            label = "Compare Variable Importance",
                                            choices = c("Random Forest", "Random Forest Up","XGB Up")),
                               
-                              withAnim(),
-                              
-                              
-                              
-                              
                               
                  ),
                  mainPanel(
@@ -438,12 +245,9 @@ window.onscroll = () => {
                      #moving text effect
                      HTML("<h2 style='text-align:center' class='shiny'>Most Important Variables</h2>"),
                      
-                     #<button class="glow-on-hover" type="button">HOVER ME, THEN CLICK ME!</button>
                      hr(),
-                     #fluidRow(column(12, div(actionButton("vimpress", icon("info"),
-                     #                                     style="color: #fff; background-color: #9D00FF; width:70px; height:80px; border-color: #2e6da4"), style = "float: right"))),
-                     fluidRow(column(12, div(shiny::actionButton("vimpress", class='glow-on-hover',
-                                                                 label='Info', width = "60px",
+                     #stylized button
+                     fluidRow(column(12, div(shiny::actionButton("vimpress", class='glow-on-hover', label='Info', width = "60px",
                                                                  style = 'float: right')))),
                      
                      br(),
@@ -452,59 +256,28 @@ window.onscroll = () => {
                      br(),
                      br(),
                      
-                     
-                     
-                     
-                     
-                     
-                     
-                 )
+                   )
         ),
         
         tabPanel("ALE Plots",
                  sidebarPanel(width=3,
-                              
-                              
-                              
-                              
-                              
                               selectInput(inputId = "VariableOPT",
                                           label = "Variable choose : ",
                                           choices = c("tenure", "TotalCharges","MonthlyCharges","PaymentMethod","Contract","InternetService","MultipleLines"),
                                           selected = "", width =  '200px'),
                               
                               
-                              
-                              
-                              
-                              
-                              
-                              
-                              
                  ),
                  mainPanel(
                      HTML("<h2 style='text-align: center;'>ALE plot insight</h2>"),
-                     
-                     #HTML("<div class='button'>HOVER ME</div>"),
                      hr(),
-                     
-                     
-                     
-                     
-                     
-                     
                      br(),
                      withSpinner(plotOutput("ACCUMULATEDDEPENDENCE", height="400px")), 
-                     
-                     
-                     
                      br(),
                      HTML("<h2 style='text-align: center;'>What are ALE plots?</h2>"),
-                     
-                     
                      hr(),
                      
-                     HTML("<p>
+            HTML("<p>
                   Accumulated local effects (ALE) illustrate how variables impact the predicted outcome of a machine learning model on average.
                   For numerical variables, the ALE algorithm averages the difference in small windows of a variable's range. ALE graphs are centered 
                   at 0. If the reading on the X-axis, at the point X=3 translates as -4 , this can roughly be interpreted as indicating that the 
@@ -527,20 +300,13 @@ window.onscroll = () => {
                                   
                                   
                                   
-                                  radioButtons("plot_features",
-                                               label = HTML('<FONT color="#21F8F6"><FONT size="5pt">Select model type:</FONT></FONT>'),
-                                               choices =  c("Random_Forest","Random_Forest_Up","Xgb_Up"),
-                                               selected = "Random_Forest",
-                                               inline = T,
-                                               width = "100%"),
-                                  
-                                  
-                                  
-                                  
-                                  numericInput(inputId="row_index",
-                                               label= HTML("<p>Select customer <br> (1-5000)</p>"),
-                                               value=1,
-                                               min=1, max=20,  width = '150px')  
+                        radioButtons("plot_features",
+                        label = HTML('<FONT color="#21F8F6"><FONT size="5pt">Select model type:</FONT></FONT>'),
+                        choices =  c("Random_Forest","Random_Forest_Up","Xgb_Up"),
+                        selected = "Random_Forest", inline = T, width = "100%"),
+                        numericInput(inputId="row_index",
+                        label= HTML("<p>Select customer <br> (1-5000)</p>"),
+                        value=1, min=1, max=20,  width = '150px')  
                                   
                                   
                                   
@@ -548,32 +314,28 @@ window.onscroll = () => {
                      ),
                      mainPanel(
                          
-                         
                          br(),
+                         
                          HTML("<h2 style='text-align: center;'>Breakdown Profiles</h2>"),
-                         
-                         
-                         
                          
                          hr(),
                          
-                         
-                         
-                         
-                         
                          br(),
+                         
                          withSpinner(plotOutput("EASIER", height="400px")), 
                          
-                         
-                         
                          br(),
+                         
                          br(),
                          
                          htmlOutput("DESCRIBEVARY"),
                          
                          br(),
+                         
                          br(),
+                         
                          HTML("<h3 style='text-align: center;'>What are Breakdown Plots conveying?</h3>"),
+                         
                          hr(),
                         
                          HTML("<p class=reduced>There are two broad types of model explanatory tools, namely local and global.
@@ -590,63 +352,25 @@ window.onscroll = () => {
                              will churn, whereas green bars represent variables that increase the likelihood a customer will churn. 
                              The purple bar shows the prediction for the particular customer being evaluated.
                              </p>"),
-                         
-                         
-                         
-                         
-                         
-                     )  
+                         )  
                  )     
         ),
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        tabPanel("New Predictions",
+       tabPanel("New Predictions",
                  fluidPage(
                      
-                     #tags$h2("Select a model, and enjoy making new predictions!"),
+                   #more moving text
                      HTML("<h2 class='shiny'>Test Results</h2>"),
                      
                      
                      hr(),
-                     #fluidRow(column(12, div(actionButton("metricmessage", icon("info"), style="color: #fff; width:70px; height:80px; background-color: #9D00FF; border-color: #2e6da4"), style = "float: right"))),                                  
+                     
                      fluidRow(column(12, div(shiny::actionButton("metricmessage", class='glow-on-hover',
                                                                  label='Info', width = "70px",
                                                                  style = 'float: right')))),
                      br(),
                      
-                     
-                     
-                     
-                     
-                     #fluidRow(
-                     # column(3, offset=4,tags$b("Performance results from test data shown below!"),)),
-                     #textOutput('greeting'),
                      br(),
-                     #tags$h3(class="shiny","Predicted Probability of Churn:"),
-                     #textOutput(outputId = "forlabelresult"),
                      
                      fluidRow(
                          column(2, radioButtons(inputId = "MODELCHOICE",
@@ -654,49 +378,32 @@ window.onscroll = () => {
                                                 choices = c("RANDOM_FOREST","RF_UP","XGB_UP"))),
                          
                          
-                         #column(1, offset=1, withAnim(),
-                         #div( id = 'shinyLogo', tags$img(src= "https://hineon.com/wp-content/uploads/2019/09/neon-arrow.jpg", width = "100px", height = "100px"))),      
-                         
-                         column(6, offset=2, withSpinner(plotOutput("PlotResults", width = "600px", height = "300px"))),
+                        column(6, offset=2, withSpinner(plotOutput("PlotResults", width = "600px", height = "300px"))),
                          
                          br(),
                          
-                         
-                         
-                         
-                     ),
-                     
-                     
+                      ),
                      
                      hr(),
                      
                      HTML("<h5>Make informed decisions.</h5>"),
                      
                      fluidRow(
-                         column(3, #offset = 1,
+                         column(3, 
                                 
                                 h4(class="glow","Probability of Churn:"),
-                                #textOutput(outputId = "forlabelresult"),
+                               
                                 withSpinner(gaugeOutput("GAUGER", width = "200px", height = "100px")),
                                 br(),
-                                #textOutput(outputId = "forlabelresult"),
+                                
                                 htmlOutput("some_text"),
                                 hr(),
-                                #radioButtons(inputId = "MODELCHOICE",
-                                #label = HTML('<FONT color="#9B59F6"><FONT size="5pt">Select model type</FONT></FONT>'),
-                                #choices = c("RANDOM_FOREST","RF_UP","XGB_UP")),
                                 
                                 tags$div(id='my_div',
                                          class='my_class',selectInput(inputId="PaperlessBillingChoice", label="Paperless Billing:", choices =levels(train_data$PaperlessBilling),  selected = "Yes", width =  '100px')),  
                                 selectInput(inputId="PhoneServiceChoice", label="Phone Service:", choices =levels(train_data$PhoneService),  selected = "Yes", width =  '100px'),
                                 
-                                
-                                
-                                
-                                
-                                
-                                
-                         ),
+                          ),
                          column(2,
                                 
                                 selectInput(inputId="DependentsChoice", label="Dependents:", choices =levels(train_data$Dependents),  selected = "No", width =  '100px'),  
@@ -713,8 +420,6 @@ window.onscroll = () => {
                                 
                                 selectInput(inputId="DeviceProtectionChoice", label="Device Protection:", choices =levels(train_data$DeviceProtection),  selected = "Yes", width =  '100px'),
                                 
-                                
-                                
                          ),
                          column(2,
                                 selectInput(inputId="PartnerChoice", label="Partner:", choices =levels(train_data$Partner),  selected = "No", width =  '100px'),  
@@ -729,8 +434,6 @@ window.onscroll = () => {
                                 
                          ),
                          column(3,
-                                
-                                
                                 
                                 
                                 sliderInput("TenureIn", "Tenure",  min = min(train_data$tenure), max = max(train_data$tenure) , value = min(train_data$tenure)
