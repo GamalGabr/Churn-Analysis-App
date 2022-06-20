@@ -4,6 +4,7 @@ library(dplyr)
 library(shinythemes)
 library(plotly)
 library(DT)
+library(shinyWidgets)
 library(tidyverse)
 library(purrr)
 library(bbplot)
@@ -31,8 +32,9 @@ library(xgboost)
 library(randomForest)
 library(shinycustomloader)
 library(hover)
-source("css_churn2.R")
 
+
+source("css_churn2.R")
 source("important_data2.R")
 
 
@@ -41,62 +43,24 @@ source("important_data2.R")
 
 
 
-#to be used in the less/more read function
-TEXT_FOLD <- "
-.morecontent span {
-    display: none;
-}
-.morelink {
-    display: block;
-}
-"
 
-JAVA_ADD <- '
-$(document).ready(function() {
-    // Configure/customize these variables.
-    var showChar = 143;  // How many characters are shown by default
-    var ellipsestext = "...";
-    var moretext = "Show more >";
-    var lesstext = "Show less";
+
+
     
-    $(".more").each(function() {var content = $(this).html();
-        if(content.length > showChar) {
-            var c = content.substr(0, showChar);
-            var h = content.substr(showChar, content.length - showChar);
-            var html = c + "<span class=\\\"moreellipses\\\">" + ellipsestext 
-              + "&nbsp;</span><span class=\\\"morecontent\\\"><span>" + h 
-              + "</span>&nbsp;&nbsp;<a href=\\\"\\\" class=\\\"morelink\\\">" 
-              + moretext + "</a></span>";
-            $(this).html(html);
-        }
-    });
- 
-    $(".morelink").click(function(){
-        if($(this).hasClass("less")) {
-            $(this).removeClass("less");
-            $(this).html(moretext);
-        } else {
-            $(this).addClass("less");
-            $(this).html(lesstext);
-        }
-        $(this).parent().prev().toggle();
-        $(this).prev().toggle();
-        return false;
-    });
-});
-'
 
 
 
 shinyUI(fluidPage(
     
-    #call scripts from above
-    tags$style(HTML(TEXT_FOLD)), 
-    tags$script(HTML(JAVA_ADD)),
-  
+    
+    
+    #ensure mobile compatibility
+    HTML('<meta name="viewport" content="width=1024">'),
     #call primary css script for decoration
     tags$style(cssUPGRADE),
     
+    #slider colours
+    setSliderColor(c("#B026FF ", "#B026FF", "#B026FF", "#B026FF", "#B026FF", "#B026FF"), c(1, 2, 3, 4, 5, 6)),
     #recruit Shinyjs
     useShinyjs(),
     
@@ -160,10 +124,10 @@ shinyUI(fluidPage(
                  HTML("<br>"),
                  
                  #primary introduction
-                 tags$span(
-                     class = "more", 
+                 #tags$span(
+                     #class = "more", 
                      HTML( "Welcome to this Churn analysis app! The original IBM dataset contained the information of 7043 
-                  fictional telecommunications customers, with 21 variables relating to whether or not they churned. 
+                 telecommunications customers, with 21 variables relating to whether or not they churned. 
                  This app employs cutting-edge artifical intelligence to uncover key relationships between Churn and 
                  a range of variables. In keeping with traditional data analytics, the original dataset was partitioned 
                  into a training and test set. Three algorithms were trained: using the original dataset with its inherent 
@@ -189,10 +153,10 @@ shinyUI(fluidPage(
           <li> XGB_UP - Extreme Gradient Boosting, a type of tree-based algorithm that was trained using upsampled data</li> 
           <li> Random Forest- Random Forest algorithm trained on the original data</li>
           <li> Random_Forest_Up - Random Forest algorithm trained on upsampled data</li>
-          </ul>
+          </ul>"
           
-        " )),
-        ),
+        #" )),
+        )),
         tabPanel(title="Visuals",
                  value="VISUALTAB",
                  
@@ -221,7 +185,7 @@ shinyUI(fluidPage(
                      br(),
                      br(),
                      br(),
-                     withSpinner(highchartOutput("HIGHCHARTOPT", height = "700%", width="115%")),  
+                     withSpinner(highchartOutput("HIGHCHARTOPT", height = "1100%", width="110%")),  
                      br(),
                      br(),
                      
@@ -243,9 +207,9 @@ shinyUI(fluidPage(
                      
                      
                      #moving text effect
-                     HTML("<h2 style='text-align:center' class='shiny'>Most Important Variables</h2>"),
+                     HTML("<h2 style='text-align:center' class='underlinestyle'>Most Important Variables</h2>"),
+                     HTML("<br>"),
                      
-                     hr(),
                      #stylized button
                      fluidRow(column(12, div(shiny::actionButton("vimpress", class='glow-on-hover', label='Info', width = "60px",
                                                                  style = 'float: right')))),
@@ -269,15 +233,15 @@ shinyUI(fluidPage(
                               
                  ),
                  mainPanel(
-                     HTML("<h2 style='text-align: center;'>ALE plot insight</h2>"),
-                     hr(),
+                     HTML("<h2 style='text-align: center' class='underlinestyle'>ALE plot insight</h2>"),
+                     
                      br(),
                      withSpinner(plotOutput("ACCUMULATEDDEPENDENCE", height="400px")), 
                      br(),
-                     HTML("<h2 style='text-align: center;'>What are ALE plots?</h2>"),
-                     hr(),
+                     HTML("<h2 style='text-align: center'  class='underlinestyle'>What are ALE plots?</h2>"),
+                     HTML("<br>"),
                      
-            HTML("<p>
+            HTML("<p class=reduced>
                   Accumulated local effects (ALE) illustrate how variables impact the predicted outcome of a machine learning model on average.
                   For numerical variables, the ALE algorithm averages the difference in small windows of a variable's range. ALE graphs are centered 
                   at 0. If the reading on the X-axis, at the point X=3 translates as -4 , this can roughly be interpreted as indicating that the 
@@ -301,12 +265,13 @@ shinyUI(fluidPage(
                                   
                                   
                         radioButtons("plot_features",
-                        label = HTML('<FONT color="#21F8F6"><FONT size="5pt">Select model type:</FONT></FONT>'),
+                        label = HTML('<FONT color="#21F8F6"><FONT size="4pt">Select model type:</FONT></FONT>'),
                         choices =  c("Random_Forest","Random_Forest_Up","Xgb_Up"),
-                        selected = "Random_Forest", inline = T, width = "100%"),
+                        selected = "Random_Forest", inline = F, width = "80%"),
+                        HTML("<br>"),
                         numericInput(inputId="row_index",
-                        label= HTML("<p>Select customer <br> (1-5000)</p>"),
-                        value=1, min=1, max=20,  width = '150px')  
+                        label= HTML("<p> Customer: <br> (1-5000)</p>"),
+                        value=1, min=1, max=20,  width = '140px')  
                                   
                                   
                                   
@@ -316,9 +281,9 @@ shinyUI(fluidPage(
                          
                          br(),
                          
-                         HTML("<h2 style='text-align: center;'>Breakdown Profiles</h2>"),
+                         HTML("<h2 style='text-align: center' class='underlinestyle'>Breakdown Profiles</h2>"),
                          
-                         hr(),
+                         
                          
                          br(),
                          
@@ -334,9 +299,9 @@ shinyUI(fluidPage(
                          
                          br(),
                          
-                         HTML("<h3 style='text-align: center;'>What are Breakdown Plots conveying?</h3>"),
+                         HTML("<h3 style='text-align: center; class='underlinestyle'>What are Breakdown Plots conveying?</h3>"),
                          
-                         hr(),
+                         
                         
                          HTML("<p class=reduced>There are two broad types of model explanatory tools, namely local and global.
                              For instance, ALE plots are a form of global explanation in that they yield an overall 
